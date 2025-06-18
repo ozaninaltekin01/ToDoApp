@@ -1,5 +1,4 @@
 from fastapi import APIRouter,Depends,Path, HTTPException,status
-from alembic.util import status
 from models import Todo
 from database import SessionLocal
 from typing import Annotated
@@ -7,7 +6,6 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
 
 router = APIRouter()
-
 
 
 
@@ -26,7 +24,7 @@ def get_db():
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
-@router.get("/read_all")
+@router.get("/get_all")
 async def read_all(db: db_dependency):
     return db.query(Todo).all()
 
@@ -39,7 +37,7 @@ async def read_by_id(db: db_dependency,todo_id: int = Path(gt=0)):
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Todo not found")
 
 
-@router.post("/create_todo",status_code=status.HTTP_201_CREATED)
+@router.post("/create",status_code=status.HTTP_201_CREATED)
 async def create_todo(db:db_dependency,todo_request: TodoRequest):
     todo = Todo(**todo_request.model_dump())
     db.add(todo)
@@ -47,7 +45,7 @@ async def create_todo(db:db_dependency,todo_request: TodoRequest):
     db.refresh(todo)
     return todo
 
-@router.put("/update_todo/{todo_id}",status_code=status.HTTP_200_OK)
+@router.put("/update/{todo_id}",status_code=status.HTTP_200_OK)
 async def update_todo(db: db_dependency,todo_request:TodoRequest, todo_id: int = Path(gt=0)):
     todo = db.query(Todo).filter(Todo.id == todo_id).first()
     if todo is None:
@@ -62,7 +60,7 @@ async def update_todo(db: db_dependency,todo_request:TodoRequest, todo_id: int =
     db.refresh(todo)
     return todo
 
-@router.delete("/delete_todo/{todo_id}",status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/delete/{todo_id}",status_code=status.HTTP_204_NO_CONTENT)
 async def delete_todo(db: db_dependency, todo_id: int = Path(gt=0)):
     todo = db.query(Todo).filter(Todo.id == todo_id).first()
     if todo is None:
