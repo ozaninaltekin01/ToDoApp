@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException,Request
 from pydantic import BaseModel
 from typing import Annotated
 from sqlalchemy.orm import Session
@@ -9,8 +9,11 @@ from models import User
 from passlib.context import CryptContext
 from jose import jwt,JWTError
 from datetime import timedelta, datetime, timezone
+from fastapi.templating import Jinja2Templates
 
 router = APIRouter()
+
+templates = Jinja2Templates(directory="templates")
 
 SECRET_KEY = "ant1rg41gabmvmsl0s31mls3ka8jv9ae"
 ALGORITHM = "HS256"
@@ -75,7 +78,13 @@ def create_access_toke(username: str, user_id: int,
     payload.update({'exp': expires})
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
+@router.get("/login-page")
+def render_login_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
 
+@router.get("/register-page")
+def render_register_page(request: Request):
+    return templates.TemplateResponse("register.html", {"request": request})
 
 
 @router.post("/create_user", status_code=201)
