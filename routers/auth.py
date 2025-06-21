@@ -87,7 +87,7 @@ def render_register_page(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
 
 
-@router.post("/create_user", status_code=201)
+@router.post("/create_user", status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependency,create_user_request: CreateUserRequest):
     user = User(
         username=create_user_request.username,
@@ -101,6 +101,8 @@ async def create_user(db: db_dependency,create_user_request: CreateUserRequest):
     )
     db.add(user)
     db.commit()
+    db.refresh(user)
+    return {"message": "User created successfully", "user_id": user.id}
 
 @router.post("/token",response_model= Token)
 async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,Depends()],

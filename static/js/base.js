@@ -191,7 +191,7 @@
             };
 
             try {
-                const response = await fetch('/auth', {
+                const response = await fetch('/auth/create_user', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -201,10 +201,16 @@
 
                 if (response.ok) {
                     window.location.href = '/auth/login-page';
-                } else {
-                    // Handle error
-                    const errorData = await response.json();
-                    alert(`Error: ${errorData.message}`);
+                } else  {
+                // Hata işleme kısmını daha sağlam hale getirelim (önceki önerimdeki gibi)
+                let errorMessage = "Hesap oluşturulurken bilinmeyen bir hata oluştu.";
+                try {
+                  const errorData = await response.json();
+                  errorMessage = errorData.detail || JSON.stringify(errorData);
+                } catch (jsonError) {
+                  errorMessage = await response.text();
+                }
+                alert(`Hesap oluşturulurken hata oluştu: ${errorMessage}`);
                 }
             } catch (error) {
                 console.error('Error:', error);
