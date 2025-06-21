@@ -150,7 +150,7 @@ def create_todo_with_gemini(todo_string: str):
     response=llm.invoke(
         [
             HumanMessage(content="Yapılacaklar listeme eklemek için sana bir görev vereceğim. Senden istediğim, bu görevin anlamını bozmadan daha uzun ve kapsamlı bir açıklamasını oluşturman. Bir sonraki mesajım görevim olacak:"),
-            HumanMessage(content=todo_string),
+            HumanMessage(content=todo_string)
         ]
     )
     return markdown_to_text(response.content)
